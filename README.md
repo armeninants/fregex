@@ -4,6 +4,10 @@
 
 The Fregex laguage extends regular expressions with user-friendly combinators and is transpiled back into regular expressions.
 
+[![GitHub CI](https://github.com/armeninants/fregex/workflows/Haskell-CI/badge.svg)](https://github.com/armeninants/fregex/actions)
+[![GitHub release](https://github.com/armeninants/fregex/workflows/Release/badge.svg)](https://github.com/armeninants/fregex/releases/)
+
+
 
 ## Usage
 
