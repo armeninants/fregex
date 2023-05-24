@@ -1,0 +1,8 @@
+cradle:
+  cabal:
+  - component: "lib:fregex"
+    path: ./src
+  - component: "fregex:exe:ai-fregex"
+    path: ./app/fregex
+  - component: "fregex:test:fregex-test"
+    path: ./test

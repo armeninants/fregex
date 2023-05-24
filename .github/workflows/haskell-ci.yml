@@ -1,0 +1,49 @@
+name: Haskell-CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cabal: ["3.8"]
+        ghc: ["9.2.7"]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Setup Haskell
+        uses: haskell/actions/setup@v2.0.1
+        id: setup-haskell-cabal
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+
+      - name: Freeze
+        run: |
+          cabal update
+          cabal freeze
+
+      - name: Cache ~/.cabal/store
+        uses: actions/cache@v3.0.11
+        with:
+          path: |
+            ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+            dist-newstyle
+          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+ 
+      - name: Install dependencies
+        run: cabal build --only-dependencies
+
+      - name: Build
+        run: cabal build all

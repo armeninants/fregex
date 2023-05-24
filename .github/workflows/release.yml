@@ -1,0 +1,104 @@
+name: Release
+
+on:
+  # Trigger the workflow on the new 'v*' tag created
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  create_release:
+    name: Create Github Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+
+  build_artifact:
+    needs: [create_release]
+    name: ${{ matrix.os }}/${{ github.ref }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        cabal: ["3.8"]
+        ghc: ["9.2.7"]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Setup Haskell
+        uses: haskell/actions/setup@v2.0.1
+        id: setup-haskell-cabal
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+
+      - name: Freeze
+        run: |
+          cabal update
+          cabal freeze
+
+      - name: Cache ~/.cabal/store
+        uses: actions/cache@v3.0.11
+        with:
+          path: |
+            ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+            dist-newstyle
+          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+
+      - name: Build binary
+        run: |
+          mkdir dist
+          cabal install --install-method=copy --overwrite-policy=always --installdir=dist
+
+      # - if: matrix.os == 'windows-latest'
+      #   name: Set extension to .exe on Windows
+      #   run: echo "EXT=.exe" >> $GITHUB_ENV
+
+      - name: Set binary path name
+        run: echo "BINARY_PATH=./dist/ai-fregex" >> $GITHUB_ENV
+
+      - name: Compress binary
+        uses: svenstaro/upx-action@2.0.1
+        with:
+          file: ${{ env.BINARY_PATH }}
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.BINARY_PATH }}
+          asset_name: ai-fregex-${{ runner.os }}${{ env.EXT }}
+          asset_content_type: application/octet-stream
+
+  release:
+    needs: [create_release, build_artifact]
+    name: Publsih Github Release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: eregon/publish-release@v1.0.5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ needs.create_release.outputs.id }}

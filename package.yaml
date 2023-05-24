@@ -1,0 +1,118 @@
+name:                fregex
+version:             0.1.0
+github:              armeninants/fregex
+license:             BSD3
+author:              Armen Inants
+maintainer:          armen@inants.com
+copyright:           2022 Armen Inants
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/armeninants/fregex#readme>
+
+dependencies:
+- base >= 4.11 && < 10
+- rio >= 0.1.12.0
+- parsec
+- pretty-show
+- bytestring
+- array
+- optparse-simple
+- lens
+- microlens-th
+- Glob
+- shelly
+- aeson
+- vector
+- process
+- extra
+- text
+- prettyprinter
+- string-qq
+- indents
+- yaml
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+  build-tools:
+  - alex
+  - happy
+  # other-modules:
+  # - Regex.Lexer
+
+executables:
+  ai-fregex:
+    main:                Main.hs
+    source-dirs:         app/fregex
+    dependencies:
+    - fregex
+    - optparse-simple
+
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+
+tests:
+  fregex-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - fregex
+    - hspec
+    - QuickCheck
+    - hspec-checkers
+    - ansi-terminal
+
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+
+default-extensions:
+  - BangPatterns
+  - DataKinds
+  - DeriveAnyClass
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - FlexibleContexts
+  - FlexibleInstances
+  - GADTs
+  - LambdaCase
+  - MultiParamTypeClasses
+  - NoImplicitPrelude
+  - NoMonomorphismRestriction
+  - OverloadedStrings
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeOperators
+  - MultiWayIf

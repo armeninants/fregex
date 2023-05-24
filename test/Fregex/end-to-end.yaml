@@ -1,0 +1,11 @@
+success:
+- fregex: |-2
+    <within sentence>
+      qualitative calculus
+      what
+  regex: \b(?:qualitative calculus)(?:[^\w.]+\w+){1,20}?[^\w.]+(?:what)|(?:what)(?:[^\w.]+\w+){1,20}?[^\w.]+(?:qualitative calculus)\b
+fail:
+- fregex: |-2
+    <within sentence>
+       qualitative calculus
+      what
