@@ -29,10 +29,32 @@ In addition, it has the following combinators:
 
 Is used to match such sentences, in which all arguments of `<within sentence>` occur.
 
+### `<choice>`
+
+At least one of the choices should be true.
+
+### `<year future>`
+
+Year in the future.
+
+### `<year 21cent>`
+
+Year in the 21st century.
+
+### `<year 2020s>`
+
+Year in the 20s.
+
+### `<year>`
+
+Any year.
+
 **Example**
 ```
 <within sentence>
-  word1|word2
+  <choice>
+    word1
+    <year future>
   word3
 ```
-Matches sentence with occurrence of "word1" and "word3", or "word2" and "word3".
+Matches sentence with occurrence of "word1" and "word3", or any year in the future and "word3".
